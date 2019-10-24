@@ -1,8 +1,6 @@
 clear variables 
 close all
 
-d = newcolumnCodes; 
-columnns = [d.ts_TrialStart,a]
 %make array newColumnCodes filled with the 23 relevant codes from
 %columnCodes_2D
 
@@ -20,7 +18,7 @@ for i = 1:length(fileList)
         
         filename = [sDir fileList(i,1).name];
         tempData = jsondecode(fileread(filename)); 
-        columncode = newcolumnCodes(j);
+        columncode = gitcolumnCodes(j);
 
         if strcmp(tempData.(columncode), 'down') == 1
             colordatamatrix(i,j) = 0;

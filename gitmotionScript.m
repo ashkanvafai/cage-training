@@ -16,7 +16,7 @@ for i = 1:length(fileList)
         
         filename = [sDir fileList(i,1).name];
         tempData = jsondecode(fileread(filename)); 
-        columncode = newcolumnCodes(j);
+        columncode = gitcolumnCodes(j);
         
         if strcmp(tempData.(columncode), 'left') == 1
             motiondatamatrix(i,j) = 0;
