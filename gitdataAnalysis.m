@@ -1,17 +1,20 @@
-clear variables 
-close all  
+%clear variables 
+%close all  
+
+% TODO: save data file in datafolder, load data file here
+
 %-----------------------------------------------------------------------%
 %% 
 %Psychometric Function for Color data
-global colordatamatrix;
+%global colordatamatrix;
 
-cohVector = colordatamatrix(:,8);
-accVector = colordatamatrix(:,14);
+cohVector = colordatamatrix(:,C.colorCoherence);
+accVector = colordatamatrix(:,C.isCorrect);
 
 cohList = unique(cohVector);
 
 for i=1:length(cohList)
-    meanvector1(i) = mean(accVector(cohVector==cohList(i)))
+    meanvector1(i) = mean(accVector(cohVector==cohList(i)));
 end
 
 
