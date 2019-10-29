@@ -5,38 +5,37 @@ close all
 %columnCodes_2D
 
 %location of the folder with color data
-sDir = '/Users/ashkanvafai/Documents/Motion and Color/color/';
+%sDir = '/Users/ashkanvafai/Documents/Motion and Color/color/';
+sDir = '/Users/Danique/Documents/Cage training/20190131/color/';
 fileList = dir(fullfile(sDir, '*.json')); 
 
 %create matrix to store 23 data points each for n .json files. 
-global colordatamatrix;
-colordatamatrix = zeros(length(fileList),23); 
+%global colordatamatrix;
+colordatamatrix = nan(length(fileList),92); 
+        
+C = gitcolumnCodes_2D;
 
 %loop through list of .json files and add to the datamatrix using columnCodes to reference relevant data. 
 for i = 1:length(fileList)
-    for j = 1:23
+    filename = [sDir fileList(i,1).name];
+    tempData = jsondecode(fileread(filename));
+    
+        if strcmp(tempData.response,'down')
+            colordatamatrix(i,C.target_choice) = 0;
+        elseif strcmp(tempData.response, 'up')
+            colordatamatrix(i,C.target_choice) = 1;
+        end
         
-        filename = [sDir fileList(i,1).name];
-        tempData = jsondecode(fileread(filename)); 
-        columncode = gitcolumnCodes(j);
+        colordatamatrix(i,C.colorCoherence) = tempData.coherence;
+        
+        colordatamatrix(i,C.isCorrect) = tempData.accuracy;
+        
+        colordatamatrix(i,C.react_time) = tempData.goRT;
+        
+end
 
-        if strcmp(tempData.(columncode), 'down') == 1
-            colordatamatrix(i,j) = 0;
-        end
-        
-        if strcmp(tempData.(columncode), 'up') == 1
-            colordatamatrix(i,j) = 1;
-        end
-        
-        if strcmp(tempData.(columncode), 'up') == 0 && strcmp(tempData.(columncode), 'down') == 0
-            colordatamatrix(i,j) = tempData.(columncode);
-        end    
-        
-    end 
-end        
- 
 
 %save this matrix to its own .mat file 
-save('colordatamatrix');
+%save('colordatamatrix');
 %load the matrix .mat file to a new script and perform calculations there.
 
