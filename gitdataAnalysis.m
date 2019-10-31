@@ -2,12 +2,12 @@
 %close all  
 
 % TODO: save data file in datafolder, load data file here
+load('/Users/ashkanvafai/Documents/Motion and Color/Data Matrix');
+C = gitcolumnCodes_2D; 
 
 %-----------------------------------------------------------------------%
 %% 
-%Psychometric Function for Color data
-%global colordatamatrix;
-
+%coherence vs. percent correct
 cohVector = colordatamatrix(:,C.colorCoherence);
 accVector = colordatamatrix(:,C.isCorrect);
 
@@ -25,34 +25,22 @@ ylabel('Accuracy');
 xlabel('Coherence');
 %-----------------------------------------------------------------------%
 %%
-
-
-dirVector = colordatamatrix(:,7);
-cohVector = colordatamatrix(:,8);
-meanVector = [];
-for i=1:length(cohVector)
-    if dirVector(i) == 0
-        correcter = cohVector(i);
-        cohVector(i) = (1 - correcter);
-    end
-end
-
-choiceVector = colordatamatrix(:,13);
+cohVector = colordatamatrix(:,C.colorCoherence);
+choiceVector = colordatamatrix(:,C.target_choice);
 cohList = unique(cohVector);
 
+meanVector = [];
 for i=1:length(cohList)
-    meanvector(i) = mean(choiceVector(cohVector==cohList(i)))
+    meanVector(i) = mean(choiceVector(cohVector==cohList(i)))
 end
 
-meanvectors = meanvector';
-
-glmstats = glmfit(cohList,meanvectors,'binomial');
-%yfit = glmstats(1) + (glmstats(2)*cohList);
+meanVectors = meanVector';
+glmstats = glmfit(cohList,meanVectors,'binomial');
 yfit(:,1) = glmval(glmstats(:,1),cohList(:,1), 'logit');
 
 subplot(2,2,1);
 hold on 
-scatter(cohList,meanvector);
+scatter(cohList,meanVector);
 plot(cohList, yfit, 'Color','r');
 title('Psychometric Function for Color');
 ylabel('Proportion Rightward Choice');
@@ -69,7 +57,7 @@ hold off;
 %Already made colordatamatrix and accVector
 
 %Make unixtime vector
-timeVector = colordatamatrix(:,19);
+timeVector = colordatamatrix(:,C.time_target1_on);
 
 
 averageacc = [];
@@ -114,9 +102,7 @@ xlabel('Time');
 %% 
 %Plot accuracy as a function of dot duration
 
-accVector = colordatamatrix(:,14);
-dotdurationVector = colordatamatrix(:,10);
-%hist(dotdurationVector);
+dotdurationVector = colordatamatrix(:,C.dot_duration);
 dotdurationList = unique(dotdurationVector);
 
 edges = dotdurationList(1:20:end);
@@ -151,9 +137,8 @@ hold off;
     
 %-----------------------------------------------------------------------%
 %%
-goRTVector = colordatamatrix(:,15);
-accVector = colordatamatrix(:,14);
-responseVector = colordatamatrix(:,13);
+goRTVector = colordatamatrix(:,C.react_time);
+responseVector = colordatamatrix(:,C.target_choice);
 
 % parse out the correct choices from accuracy vector 
 correctChoicesGoRT = [];

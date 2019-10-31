@@ -12,7 +12,7 @@ motiondatamatrix = zeros(length(fileList),23);
 
 %loop through list of .json files and add to the datamatrix using columnCodes to reference relevant data. 
 for i = 1:length(fileList)
-    for j = 1:23
+    for j = 1:23 
         
         filename = [sDir fileList(i,1).name];
         tempData = jsondecode(fileread(filename)); 
