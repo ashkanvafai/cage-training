@@ -35,9 +35,9 @@ for i = 1:length(fileList)
         colordatamatrix(i,C.react_time) = tempData.goRT;
   
         if tempData.direction == 0
-            colordatamatrix(i,C.colorCoherence) = (1 - tempData.coherence);
+            colordatamatrix(i,C.colorCoherence) = (0.5 - tempData.coherence);
         elseif tempData.direction == 1
-            colordatamatrix(i,C.colorCoherence) = tempData.coherence;
+            colordatamatrix(i,C.colorCoherence) = (tempData.coherence - 0.5);
         end
         
         colordatamatrix(i,C.time_target1_on) = tempData.unixTime;
