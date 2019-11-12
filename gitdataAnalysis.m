@@ -1,7 +1,7 @@
 %clear variables 
 %close all  
 
-% TODO: save data file in datafolder, load data file here
+%save data file in datafolder, load data file here
 load('/Users/ashkanvafai/Documents/Motion and Color/Data Matrix');
 C = gitcolumnCodes_2D; 
 
@@ -45,10 +45,14 @@ plot(cohList, yfit, 'Color','r');
 title('Psychometric Function for Color');
 ylabel('Proportion Rightward Choice');
 xlabel('Coherence');
-x = [0,1];
+%horizontal line
+x = [-0.5,0.5];
 y = [.5,.5];
+%vertical line
+z = [0,0];
+q = [1,0];
 line(x,y, 'Color','Black','LineStyle','-');
-line(y,x, 'Color','Black','LineStyle','-');
+line(z,q, 'Color','Black','LineStyle','-');
 hold off;
 
 %-----------------------------------------------------------------------%
