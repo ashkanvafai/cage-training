@@ -4,6 +4,8 @@
 %save data file in datafolder, load data file here
 load('/Users/ashkanvafai/Documents/Motion and Color/Data Matrix');
 C = gitcolumnCodes_2D; 
+hFig=figure('Position',[400 200 1200 600]);
+colormap (hFig,winter); %Not working
 
 %-----------------------------------------------------------------------%
 %% 
@@ -37,8 +39,8 @@ end
 meanVectors = meanVector';
 glmstats = glmfit(cohList,meanVectors,'binomial');
 yfit(:,1) = glmval(glmstats(:,1),cohList(:,1), 'logit');
-
-subplot(2,2,1);
+set(0,'CurrentFigure',hFig);
+subplot(3,2,1);
 hold on 
 scatter(cohList,meanVector);
 plot(cohList, yfit, 'Color','r');
@@ -97,7 +99,8 @@ finalbins = datetime(bins/1000,'ConvertFrom','posixTime','TimeZone','America/New
 finalbinsrow = finalbins.';
 finalbinsrow = finalbinsrow(1:end-1);
 
-subplot(2,2,3);
+set(0,'CurrentFigure',hFig);
+subplot(3,2,3);
 plot(finalbinsrow,averageacc,'Color', 'bl');
 title('Performance Over the Course of the Day');
 ylabel('Accuracy (10 Minute Increments)');
@@ -114,20 +117,21 @@ means = zeros(length(edges),1);
 binaccuracy = [];
 lines = [];
 
-subplot(2,2,4);
+set(0,'CurrentFigure',hFig);
+subplot(3,2,4);
+
 title('Accuracy vs. Dot Duration (For All Coherences)');
 ylabel('Accuracy');
 xlabel('Dot Duration (ms)');
 for x=1:length(cohList)
     for j=1:length(edges)-1
         for i=1:length(dotdurationVector)
-            if (dotdurationVector(i) > edges(j) && dotdurationVector(i) < edges(j+1) && cohVector(i) == cohList(x)) %what if =
+            if (dotdurationVector(i) > edges(j) && dotdurationVector(i) < edges(j+1) && abs(cohVector(i)) == cohList(x)) %what if =
                 binaccuracy = [binaccuracy, accVector(i)];
             end
         end
         means(j) = mean(binaccuracy);
         binaccuracy = [];
-
     end
     means = means(1:end-1);
     edges = edges(1:end-1);
@@ -136,9 +140,34 @@ for x=1:length(cohList)
     text(max(edges),max(means),num2str(cohList(x)));
 end 
 
-
 hold off;
-    
+%-----------------------------------------------------------------------%
+%%    
+%plot distribution of dot durations 
+
+durationDistVector  = [];
+
+set(0,'CurrentFigure',hFig);
+subplot(3,2,6);
+
+for i=1:length(dotdurationList)-1
+    counter = 0;
+    for j=1:length(dotdurationVector)
+        if (dotdurationVector(j) == dotdurationList(i))
+            counter = counter+1;
+        end
+    end
+    durationDistVector(i) = counter;
+end 
+
+%histogram('BinEdges',dotdurationList,'BinCounts',durationDistVector)
+%histogram(durationDistVector,dotdurationList);
+hold on;
+histogram(durationDistVector);
+title('Dot Duration Distribution');
+xlabel('Dot Duration');
+ylabel('Frequency of Occurence');
+hold off;
 %-----------------------------------------------------------------------%
 %%
 goRTVector = colordatamatrix(:,C.react_time);
@@ -159,7 +188,8 @@ for i=1:length(cohList)
     correctChoicesGoRT = [];
 end 
 
-subplot(2,2,2);
+set(0,'CurrentFigure',hFig);
+subplot(3,2,2);
 
 title('goRT vs. Coherence');
 xlabel('Coherence');
@@ -168,6 +198,13 @@ hold on;
 scatter (cohList(1:6),meangoRTs(1:6),'blue','filled');
 scatter (cohList(7:12),meangoRTs(7:12),'yellow', 'filled');
 hold off;
+%-----------------------------------------------------------------------%
+%%
+%Summary statistics 
+glmstats = glmfit(cohList,meanVectors,'binomial');
+bias = glmstats(1);
+sensitivity = glmstats(2);
+
            
                 
                
