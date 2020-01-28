@@ -5,12 +5,15 @@ close all
 %columnCodes_2D
 
 %location of the folder with color data
-sDir = '/Users/ashkanvafai/Documents/Motion and Color/color/';
+sDir = '/Users/ashkanvafai/Desktop/Cage Training Data/Bo/20200121/color/';
+%sDir = '/Users/ashkanvafai/Desktop/Cage Training Data/Bo/20191125/color/';
+%sDir = '/Users/ashkanvafai/Desktop/Cage Training Data/Bo/20191122/color/';
+%sDir = '/Users/ashkanvafai/Documents/Motion and Color/color/';
 %sDir = '/Users/Danique/Documents/Cage training/20190131/color/';
+
 fileList = dir(fullfile(sDir, '*.json')); 
 
 %create matrix to store 23 data points each for n .json files. 
-%global colordatamatrix;
 colordatamatrix = nan(length(fileList),92); 
         
 C = gitcolumnCodes_2D;
@@ -18,7 +21,8 @@ C = gitcolumnCodes_2D;
 %loop through list of .json files and add to the datamatrix using columnCodes to reference relevant data. 
 for i = 1:length(fileList)
     filename = [sDir fileList(i,1).name];
-    tempData = jsondecode(fileread(filename));
+    temptempData = jsondecode(fileread(filename));
+    tempData = temptempData(1,:); %grabs the first row in case we had a messed up file
     
         if strcmp(tempData.response,'down')
             colordatamatrix(i,C.target_choice) = 0;
@@ -48,6 +52,6 @@ end
 
 
 %save this matrix to its own .mat file 
-save('/Users/ashkanvafai/Documents/Motion and Color/Data Matrix','colordatamatrix');
+save('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Bo 20200121 color','colordatamatrix');
 %load the matrix .mat file to a new script and perform calculations there.
 

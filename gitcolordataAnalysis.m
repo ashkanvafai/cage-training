@@ -2,7 +2,10 @@
 %close all  
 
 %save data file in datafolder, load data file here
-load('/Users/ashkanvafai/Documents/Motion and Color/Data Matrix');
+load('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Bo 20200121 color');
+%load('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Bo color glmstatsmatrix');
+
+
 C = gitcolumnCodes_2D; 
 hFig=figure('Position',[400 200 1200 600]);
 colormap (hFig,winter); %Not working
@@ -22,7 +25,7 @@ end
 
 %subplot(2,2,2);
 plot(cohList,meanvector1, 'Color','r');
-title('Accuracy vs. Coherence');
+title('Accuracy vs. Color Coherence');
 ylabel('Accuracy');
 xlabel('Coherence');
 %-----------------------------------------------------------------------%
@@ -38,6 +41,9 @@ end
 
 meanVectors = meanVector';
 glmstats = glmfit(cohList,meanVectors,'binomial');
+glmstatsmatrix = horzcat(glmstatsmatrix,glmstats);
+
+
 yfit(:,1) = glmval(glmstats(:,1),cohList(:,1), 'logit');
 set(0,'CurrentFigure',hFig);
 subplot(3,2,1);
@@ -117,7 +123,7 @@ means = zeros(length(edges),1);
 binaccuracy = [];
 lines = [];
 
-set(0,'CurrentFigure',hFig);
+%set(0,'CurrentFigure',hFig);
 subplot(3,2,4);
 
 title('Accuracy vs. Dot Duration (For All Coherences)');
@@ -165,8 +171,8 @@ end
 hold on;
 histogram(durationDistVector);
 title('Dot Duration Distribution');
-xlabel('Dot Duration');
-ylabel('Frequency of Occurence');
+ylabel('Dot Duration');
+xlabel('Frequency of Occurence');
 hold off;
 %-----------------------------------------------------------------------%
 %%
@@ -195,18 +201,14 @@ title('goRT vs. Coherence');
 xlabel('Coherence');
 ylabel('goRT');
 hold on;
-scatter (cohList(1:6),meangoRTs(1:6),'blue','filled');
-scatter (cohList(7:12),meangoRTs(7:12),'yellow', 'filled');
+scatter (cohList(1:5),meangoRTs(1:5),'blue','filled');
+scatter (cohList(6:11),meangoRTs(6:11),'yellow', 'filled');
 hold off;
 %-----------------------------------------------------------------------%
 %%
-%Summary statistics 
-glmstats = glmfit(cohList,meanVectors,'binomial');
-bias = glmstats(1);
-sensitivity = glmstats(2);
+save('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Bo color glmstatsmatrix','glmstatsmatrix');
 
-           
-                
+         
                
                 
             
