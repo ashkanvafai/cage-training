@@ -1,9 +1,11 @@
+%function output = motiondataAnalysis(input)
 %clear variables 
 %close all  
 
 %save data file in datafolder, load data file here
-load('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Shimmy 20200121 motion');
-load('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Shimmy motion glmstatsmatrix');
+%load('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/old dataset');
+load('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Shimmy 20191205 motion');
+%load('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Shimmy motion glmstatsmatrix');
 
 
 C = gitcolumnCodes_2D; 
@@ -23,40 +25,68 @@ for i=1:length(cohList)
 end
 
 
-%subplot(2,2,2);
+subplot(4,2,7);
 plot(cohList,meanvector1, 'Color','r');
 title('Accuracy vs. Motion Coherence');
 ylabel('Accuracy');
 xlabel('Coherence');
 %-----------------------------------------------------------------------%
 %%
+dotdurationVector = motiondatamatrix(:,C.dot_duration);
 cohVector = motiondatamatrix(:,C.motionCoherence);
 choiceVector = motiondatamatrix(:,C.target_choice);
 cohList = unique(cohVector);
 
-meanVector = [];
+highddchoices = [];
+lowddchoices = [];
+highddcohVector =[];
+lowddcohVector =[];
+for i=1:length(choiceVector)
+    if (dotdurationVector(i)>900)
+        highddchoices =[highddchoices,choiceVector(i)];
+        highddcohVector = [highddcohVector, cohVector(i)];
+    end 
+    if (dotdurationVector(i)<450)
+        lowddchoices =[lowddchoices,choiceVector(i)];
+        lowddcohVector = [lowddcohVector, cohVector(i)];
+    end 
+end 
+
+highddmeanVector = [];
 for i=1:length(cohList)
-    meanVector(i) = mean(choiceVector(cohVector==cohList(i)))
+    highddmeanVector(i) = mean(highddchoices(highddcohVector==cohList(i)))
 end
 
-meanVectors = meanVector';
-glmstats = glmfit(cohList,meanVectors,'binomial');
+highddmeanVectors = highddmeanVector';
+highddglmstats = glmfit(cohList,highddmeanVectors,'binomial');
+
+lowddmeanVector = [];
+for i=1:length(cohList)
+    lowddmeanVector(i) = mean(lowddchoices(lowddcohVector==cohList(i)))
+end
+
+lowddmeanVectors = lowddmeanVector';
+lowddglmstats = glmfit(cohList,lowddmeanVectors,'binomial');
 %glmstatsmatrix = glmstats;%just run this line to initialize 
 %glmstatsmatrix = horzcat(glmstatsmatrix,glmstats);%just run this line for
 %subsequent additions to the matrix
 
 
-yfit(:,1) = glmval(glmstats(:,1),cohList(:,1), 'logit');
-set(0,'CurrentFigure',hFig);
-subplot(3,2,1);
+highddyfit(:,1) = glmval(highddglmstats(:,1),cohList(:,1), 'logit');
+lowddyfit(:,1) = glmval(lowddglmstats(:,1),cohList(:,1), 'logit');
+subplot(4,2,1);
 hold on 
-scatter(cohList,meanVector);
-plot(cohList, yfit, 'Color','r');
+scatter(cohList,highddmeanVector);
+scatter(cohList,lowddmeanVector);
+plot(cohList, highddyfit, 'Color','b');
+    text(max(cohList),max(highddyfit),'high dot durations','Color','b');
+plot(cohList, lowddyfit, 'Color','r','LineStyle','--');
+    text(max(cohList),max(lowddyfit),'low dot durations','Color','r');
 title('Psychometric Function for Motion');
-ylabel('Proportion Yellow Choice'); %check which one is on right
+ylabel('Proportion Rightward Choice'); %check which one is on right
 xlabel('Coherence');
 %horizontal line
-x = [-0.5,0.5];
+x = [-1,1];
 y = [.5,.5];
 %vertical line
 z = [0,0];
@@ -108,7 +138,7 @@ finalbinsrow = finalbins.';
 finalbinsrow = finalbinsrow(1:end-1);
 
 set(0,'CurrentFigure',hFig);
-subplot(3,2,3);
+subplot(4,2,3);
 plot(finalbinsrow,averageacc,'Color', 'bl');
 title('Performance Over the Course of the Day');
 ylabel('Accuracy (10 Minute Increments)');
@@ -120,21 +150,20 @@ xlabel('Time');
 dotdurationVector = motiondatamatrix(:,C.dot_duration);
 dotdurationList = unique(dotdurationVector);
 
-edges = dotdurationList(1:20:end);
+edges = dotdurationList(1:100:end);
 means = zeros(length(edges),1);
 binaccuracy = [];
 lines = [];
+highcohList = [cohList(1),cohList(2),cohList(length(cohList)-1),cohList(length(cohList))];
 
-%set(0,'CurrentFigure',hFig);
-subplot(3,2,4);
-
-title('Accuracy vs. Dot Duration (For All Coherences)');
+subplot(4,2,4);
+title('Accuracy vs. Dot Duration (For High Coherences)');
 ylabel('Accuracy');
 xlabel('Dot Duration (ms)');
-for x=1:length(cohList)
+for x=1:length(highcohList)
     for j=1:length(edges)-1
         for i=1:length(dotdurationVector)
-            if (dotdurationVector(i) > edges(j) && dotdurationVector(i) < edges(j+1) && abs(cohVector(i)) == cohList(x)) %what if =
+            if (dotdurationVector(i) > edges(j) && dotdurationVector(i) < edges(j+1) && (cohVector(i)) == highcohList(x)) %what if =
                 binaccuracy = [binaccuracy, accVector(i)];
             end
         end
@@ -145,7 +174,7 @@ for x=1:length(cohList)
     edges = edges(1:end-1);
     hold on;
     plot(edges,means);
-    text(max(edges),max(means),num2str(cohList(x)));
+    text(max(edges),max(means),num2str(highcohList(x)));
 end 
 
 hold off;
@@ -156,7 +185,7 @@ hold off;
 durationDistVector  = [];
 
 set(0,'CurrentFigure',hFig);
-subplot(3,2,6);
+subplot(4,2,6);
 
 for i=1:length(dotdurationList)-1
     counter = 0;
@@ -171,10 +200,10 @@ end
 %histogram('BinEdges',dotdurationList,'BinCounts',durationDistVector)
 %histogram(durationDistVector,dotdurationList);
 hold on;
-histogram(durationDistVector);
+histogram(durationDistVector,'Orientation', 'vertical');
 title('Dot Duration Distribution');
-ylabel('Dot Duration');
-xlabel('Frequency of Occurence');
+xlabel('Representative Range of Dot Duration');
+ylabel('Frequency of Occurence');
 hold off;
 %-----------------------------------------------------------------------%
 %%
@@ -197,18 +226,54 @@ for i=1:length(cohList)
 end 
 
 set(0,'CurrentFigure',hFig);
-subplot(3,2,2);
+subplot(4,2,2);
 
 title('goRT vs. Coherence');
 xlabel('Coherence');
 ylabel('goRT');
 hold on;
-scatter (cohList(1:7),meangoRTs(1:7),'blue','filled');
-scatter (cohList(8:14),meangoRTs(8:14),'yellow', 'filled');
+mid = round(((length(cohList))/2));
+last = length(cohList);
+scatter (cohList(1:mid),meangoRTs(1:mid),'blue','filled');%handle this
+scatter (cohList((mid+1):last),meangoRTs((mid+1):last),'red', 'filled');
 hold off;
 %-----------------------------------------------------------------------%
 %%
-save('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Shimmy motion glmstatsmatrix','glmstatsmatrix');
+highddRT = [];
+highdd = [];
+
+for i=1:length(dotdurationVector)
+    if (dotdurationVector(i)>900)  && (cohVector(i)>.46 || cohVector(i)<-.46)
+        highdd = [highdd,dotdurationVector(i)];
+        highddRT = [highddRT, goRTVector(i)];
+    end
+end
+
+uniquehighdd = unique(highdd);
+temphighddRT = [];
+meanhighddRT =[];
+
+for i=1:length(uniquehighdd)
+   for j=1:length(highdd)
+        if highdd(j)==uniquehighdd(i)
+            temphighddRT = [temphighddRT,highddRT(i)];
+            %meanhighddRT(i) = mean(highddRT(highdd==uniquehighdd(i)));
+        end 
+   end 
+   meanhighddRT = [meanhighddRT,mean(temphighddRT)];
+   temphighddRT = [];
+end
+
+subplot(4,2,5);
+xlabel('High dot durations');
+ylabel('goRT');
+hold on;
+scatter(uniquehighdd,meanhighddRT);
+hold off;
+
+     
+%-----------------------------------------------------------------------%
+%save('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Shimmy motion glmstatsmatrix','glmstatsmatrix');
 
          
                

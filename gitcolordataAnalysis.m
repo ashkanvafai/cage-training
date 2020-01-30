@@ -24,37 +24,67 @@ end
 
 
 %subplot(2,2,2);
-plot(cohList,meanvector1, 'Color','r');
+%plot(cohList,meanvector1, 'Color','r');
 title('Accuracy vs. Color Coherence');
 ylabel('Accuracy');
 xlabel('Coherence');
 %-----------------------------------------------------------------------%
 %%
+dotdurationVector = colordatamatrix(:,C.dot_duration);
 cohVector = colordatamatrix(:,C.colorCoherence);
 choiceVector = colordatamatrix(:,C.target_choice);
 cohList = unique(cohVector);
 
-meanVector = [];
+highddchoices = [];
+lowddchoices = [];
+highddcohVector =[];
+lowddcohVector =[];
+for i=1:length(choiceVector)
+    if (dotdurationVector(i)>900)
+        highddchoices =[highddchoices,choiceVector(i)];
+        highddcohVector = [highddcohVector, cohVector(i)];
+    end 
+    if (dotdurationVector(i)<450)
+        lowddchoices =[lowddchoices,choiceVector(i)];
+        lowddcohVector = [lowddcohVector, cohVector(i)];
+    end 
+end 
+
+highddmeanVector = [];
 for i=1:length(cohList)
-    meanVector(i) = mean(choiceVector(cohVector==cohList(i)))
+    highddmeanVector(i) = mean(highddchoices(highddcohVector==cohList(i)))
 end
 
-meanVectors = meanVector';
-glmstats = glmfit(cohList,meanVectors,'binomial');
-glmstatsmatrix = horzcat(glmstatsmatrix,glmstats);
+highddmeanVectors = highddmeanVector';
+highddglmstats = glmfit(cohList,highddmeanVectors,'binomial');
+
+lowddmeanVector = [];
+for i=1:length(cohList)
+    lowddmeanVector(i) = mean(lowddchoices(lowddcohVector==cohList(i)))
+end
+
+lowddmeanVectors = lowddmeanVector';
+lowddglmstats = glmfit(cohList,lowddmeanVectors,'binomial');
+%glmstatsmatrix = glmstats;%just run this line to initialize 
+%glmstatsmatrix = horzcat(glmstatsmatrix,glmstats);%just run this line for
+%subsequent additions to the matrix
 
 
-yfit(:,1) = glmval(glmstats(:,1),cohList(:,1), 'logit');
-set(0,'CurrentFigure',hFig);
-subplot(3,2,1);
+highddyfit(:,1) = glmval(highddglmstats(:,1),cohList(:,1), 'logit');
+lowddyfit(:,1) = glmval(lowddglmstats(:,1),cohList(:,1), 'logit');
+subplot(4,2,1);
 hold on 
-scatter(cohList,meanVector);
-plot(cohList, yfit, 'Color','r');
-title('Psychometric Function for Color');
-ylabel('Proportion Rightward Choice');
+scatter(cohList,highddmeanVector);
+scatter(cohList,lowddmeanVector);
+plot(cohList, highddyfit, 'Color','b');
+    text(max(cohList),max(highddyfit),'high dot durations','Color','b');
+plot(cohList, lowddyfit, 'Color','r','LineStyle','--');
+    text(max(cohList),max(lowddyfit),'low dot durations','Color','r');
+title('Psychometric Function for Motion');
+ylabel('Proportion Rightward Choice'); %check which one is on right
 xlabel('Coherence');
 %horizontal line
-x = [-0.5,0.5];
+x = [-1,1];
 y = [.5,.5];
 %vertical line
 z = [0,0];
@@ -62,7 +92,6 @@ q = [1,0];
 line(x,y, 'Color','Black','LineStyle','-');
 line(z,q, 'Color','Black','LineStyle','-');
 hold off;
-
 %-----------------------------------------------------------------------%
 %% 
 %Plot color accuracy as a function of time over the course of the year?
@@ -118,7 +147,7 @@ xlabel('Time');
 dotdurationVector = colordatamatrix(:,C.dot_duration);
 dotdurationList = unique(dotdurationVector);
 
-edges = dotdurationList(1:20:end);
+edges = dotdurationList(1:100:end);
 means = zeros(length(edges),1);
 binaccuracy = [];
 lines = [];
@@ -126,13 +155,15 @@ lines = [];
 %set(0,'CurrentFigure',hFig);
 subplot(3,2,4);
 
-title('Accuracy vs. Dot Duration (For All Coherences)');
+highcohList = [cohList(1),cohList(2),cohList(length(cohList)-1),cohList(length(cohList))];
+
+title('Accuracy vs. Dot Duration (For High Coherences)');
 ylabel('Accuracy');
 xlabel('Dot Duration (ms)');
-for x=1:length(cohList)
+for x=1:length(highcohList)
     for j=1:length(edges)-1
         for i=1:length(dotdurationVector)
-            if (dotdurationVector(i) > edges(j) && dotdurationVector(i) < edges(j+1) && abs(cohVector(i)) == cohList(x)) %what if =
+            if (dotdurationVector(i) > edges(j) && dotdurationVector(i) < edges(j+1) && (cohVector(i)) == highcohList(x)) %what if =
                 binaccuracy = [binaccuracy, accVector(i)];
             end
         end
@@ -143,7 +174,7 @@ for x=1:length(cohList)
     edges = edges(1:end-1);
     hold on;
     plot(edges,means);
-    text(max(edges),max(means),num2str(cohList(x)));
+    text(max(edges),max(means),num2str(highcohList(x)));
 end 
 
 hold off;
@@ -172,7 +203,7 @@ hold on;
 histogram(durationDistVector);
 title('Dot Duration Distribution');
 ylabel('Dot Duration');
-xlabel('Frequency of Occurence');
+xlabel('Representative Range of Dot Durations');
 hold off;
 %-----------------------------------------------------------------------%
 %%
@@ -202,11 +233,11 @@ xlabel('Coherence');
 ylabel('goRT');
 hold on;
 scatter (cohList(1:5),meangoRTs(1:5),'blue','filled');
-scatter (cohList(6:11),meangoRTs(6:11),'yellow', 'filled');
+scatter (cohList(6:11),meangoRTs(6:11),'red', 'filled');
 hold off;
 %-----------------------------------------------------------------------%
 %%
-save('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Bo color glmstatsmatrix','glmstatsmatrix');
+%save('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Bo color glmstatsmatrix','glmstatsmatrix');
 
          
                

@@ -5,6 +5,8 @@ close all
 %columnCodes_2D
 
 %location of the folder with color data
+%sDir = '/Users/ashkanvafai/Desktop/Motion and Color/motion/';
+
 sDir = '/Users/ashkanvafai/Desktop/Cage Training Data/Shimmy/20200121/motion/';
 %sDir = '/Users/ashkanvafai/Desktop/Cage Training Data/Bo/20191125/color/';
 %sDir = '/Users/ashkanvafai/Desktop/Cage Training Data/Bo/20191122/color/';
@@ -39,9 +41,9 @@ for i = 1:length(fileList)
         motiondatamatrix(i,C.react_time) = tempData.goRT;
   
         if tempData.direction == 0
-            motiondatamatrix(i,C.motionCoherence) = (0.5 - tempData.coherence);
+            motiondatamatrix(i,C.motionCoherence) = (tempData.coherence)*(-1);
         elseif tempData.direction == 1
-            motiondatamatrix(i,C.motionCoherence) = (tempData.coherence - 0.5);
+            motiondatamatrix(i,C.motionCoherence) = (tempData.coherence);
         end
         
         motiondatamatrix(i,C.time_target1_on) = tempData.unixTime;
