@@ -1,14 +1,14 @@
+function [glmstats] = gitcolordataAnalysis(colordatamatrix, name, day, task)
 %clear variables 
 %close all  
 
 %save data file in datafolder, load data file here
-load('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Bo 20200121 color');
+%load('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Bo 20200121 color');
 %load('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Bo color glmstatsmatrix');
 
 
 C = gitcolumnCodes_2D; 
-hFig=figure('Position',[400 200 1200 600]);
-colormap (hFig,winter); %Not working
+hFig=figure('Position',[400 200 1200 600],'Name',char(strcat(name,day,task)));
 
 %-----------------------------------------------------------------------%
 %% 
@@ -23,8 +23,8 @@ for i=1:length(cohList)
 end
 
 
-%subplot(2,2,2);
-%plot(cohList,meanvector1, 'Color','r');
+subplot(3,2,2);
+plot(cohList,meanvector1, 'Color','r');
 title('Accuracy vs. Color Coherence');
 ylabel('Accuracy');
 xlabel('Coherence');
@@ -69,10 +69,20 @@ lowddglmstats = glmfit(cohList,lowddmeanVectors,'binomial');
 %glmstatsmatrix = horzcat(glmstatsmatrix,glmstats);%just run this line for
 %subsequent additions to the matrix
 
+%using all dd values
+meanVector = [];
+for i=1:length(cohList)
+    meanVector(i) = mean(choiceVector(cohVector==cohList(i)))
+end
+
+meanVectors = meanVector';
+glmstats = glmfit(cohList,meanVectors,'binomial');
+
+
 
 highddyfit(:,1) = glmval(highddglmstats(:,1),cohList(:,1), 'logit');
 lowddyfit(:,1) = glmval(lowddglmstats(:,1),cohList(:,1), 'logit');
-subplot(4,2,1);
+subplot(3,2,1);
 hold on 
 scatter(cohList,highddmeanVector);
 scatter(cohList,lowddmeanVector);
@@ -134,7 +144,7 @@ finalbins = datetime(bins/1000,'ConvertFrom','posixTime','TimeZone','America/New
 finalbinsrow = finalbins.';
 finalbinsrow = finalbinsrow(1:end-1);
 
-set(0,'CurrentFigure',hFig);
+%set(0,'CurrentFigure',hFig);
 subplot(3,2,3);
 plot(finalbinsrow,averageacc,'Color', 'bl');
 title('Performance Over the Course of the Day');
@@ -184,7 +194,7 @@ hold off;
 
 durationDistVector  = [];
 
-set(0,'CurrentFigure',hFig);
+%set(0,'CurrentFigure',hFig);
 subplot(3,2,6);
 
 for i=1:length(dotdurationList)-1
@@ -225,8 +235,8 @@ for i=1:length(cohList)
     correctChoicesGoRT = [];
 end 
 
-set(0,'CurrentFigure',hFig);
-subplot(3,2,2);
+%set(0,'CurrentFigure',hFig);
+subplot(3,2,5);
 
 title('goRT vs. Coherence');
 xlabel('Coherence');

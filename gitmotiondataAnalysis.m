@@ -1,15 +1,15 @@
-%function output = motiondataAnalysis(input)
+function [glmstats] = gitmotiondataAnalysis(motiondatamatrix, name, day, task)
 %clear variables 
 %close all  
 
 %save data file in datafolder, load data file here
 %load('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/old dataset');
-load('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Shimmy 20191205 motion');
+%load('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Shimmy 20191205 motion');
 %load('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Shimmy motion glmstatsmatrix');
 
 
 C = gitcolumnCodes_2D; 
-hFig=figure('Position',[400 200 1200 600]);
+hFig=figure('Position',[400 200 1200 600],'Name',char(strcat(name,day,task)));
 colormap (hFig,winter); %Not working
 
 %-----------------------------------------------------------------------%
@@ -70,6 +70,16 @@ lowddglmstats = glmfit(cohList,lowddmeanVectors,'binomial');
 %glmstatsmatrix = glmstats;%just run this line to initialize 
 %glmstatsmatrix = horzcat(glmstatsmatrix,glmstats);%just run this line for
 %subsequent additions to the matrix
+
+%using all dd values
+meanVector = [];
+for i=1:length(cohList)
+    meanVector(i) = mean(choiceVector(cohVector==cohList(i)))
+end
+
+meanVectors = meanVector';
+glmstats = glmfit(cohList,meanVectors,'binomial');
+
 
 
 highddyfit(:,1) = glmval(highddglmstats(:,1),cohList(:,1), 'logit');
@@ -270,8 +280,11 @@ ylabel('goRT');
 hold on;
 scatter(uniquehighdd,meanhighddRT);
 hold off;
-
-     
+%-----------------------------------------------------------------------%
+%%
+subplot(4,2,7);
+figuredescription = char(strcat(name,day,task));
+text(0.4,0.5,figuredescription); axis off
 %-----------------------------------------------------------------------%
 %save('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Shimmy motion glmstatsmatrix','glmstatsmatrix');
 

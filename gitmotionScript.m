@@ -1,13 +1,11 @@
-clear variables 
-close all
-
+function [motiondatamatrix] = gitmotionScript(filename)
 %make array newColumnCodes filled with the 23 relevant codes from
 %columnCodes_2D
 
 %location of the folder with color data
 %sDir = '/Users/ashkanvafai/Desktop/Motion and Color/motion/';
 
-sDir = '/Users/ashkanvafai/Desktop/Cage Training Data/Shimmy/20200121/motion/';
+sDir = filename;
 %sDir = '/Users/ashkanvafai/Desktop/Cage Training Data/Bo/20191125/color/';
 %sDir = '/Users/ashkanvafai/Desktop/Cage Training Data/Bo/20191122/color/';
 %sDir = '/Users/ashkanvafai/Documents/Motion and Color/color/';
@@ -54,5 +52,5 @@ end
 
 
 %save this matrix to its own .mat file 
-save('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Shimmy 20200121 motion','motiondatamatrix');
+%save('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Shimmy 20200121 motion','motiondatamatrix');
 %load the matrix .mat file to a new script and perform calculations there.
