@@ -1,15 +1,34 @@
 clear variables; 
 close all;  
 
-% name = 'Bo'; dates = {'20191122','20191125','20200121'}; task = 'color';
-% name = 'Shimmy'; dates = {'20191125','20191205','20200121'}; task = 'motion';
+
+name = 'Bo'; 
+%name = 'Shimmy'; 
+
+sDir = char(strcat('/Users/ashkanvafai/Desktop/Cage Training Data/',name));
+tempdates = {};
+fileList = dir(fullfile(sDir)); 
+for i=1:length(fileList)
+    tempdates(i) = {fileList(i).name}
+end
+dates = {};
+counter = 1;
+for i=1:length(tempdates)
+    if contains(convertCharsToStrings(tempdates(i)),'20')
+        dates(counter) = tempdates(i);
+        counter = counter + 1;
+    end
+end
+
+task = 'color';
+%task = 'motion';
 
 glmstatsmatrix = [];
 
 
 for i=1:length(dates)
     
-    filename = char(strcat('/Users/ashkanvafai/Desktop/Cage Training Data/',name,'/',dates(i),'/',task,'/'));
+    filename = char(strcat(sDir,'/',dates(i),'/',task,'/'));
     
     if strcmp(task,'color')
         datamatrix = gitcolorScript(filename);

@@ -3,14 +3,14 @@ function [colordatamatrix] = gitcolorScript(filename)
 %columnCodes_2D
 
 %location of the folder with color data
-sDir = filename;
 %sDir = '/Users/ashkanvafai/Desktop/Cage Training Data/Bo/20200121/color/';
 %sDir = '/Users/ashkanvafai/Desktop/Cage Training Data/Bo/20191125/color/';
 %sDir = '/Users/ashkanvafai/Desktop/Cage Training Data/Bo/20191122/color/';
 %sDir = '/Users/ashkanvafai/Documents/Motion and Color/color/';
 %sDir = '/Users/Danique/Documents/Cage training/20190131/color/';
 
-fileList = dir(fullfile(sDir, '*.json')); 
+sDir = filename;
+fileList = dir(fullfile(filename, '*.json')); 
 
 %create matrix to store 23 data points each for n .json files. 
 colordatamatrix = nan(length(fileList),92); 

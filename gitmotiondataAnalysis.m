@@ -92,7 +92,7 @@ plot(cohList, highddyfit, 'Color','b');
     text(max(cohList),max(highddyfit),'high dot durations','Color','b');
 plot(cohList, lowddyfit, 'Color','r','LineStyle','--');
     text(max(cohList),max(lowddyfit),'low dot durations','Color','r');
-title('Psychometric Function for Motion');
+title(char(strcat('Psychometric Function for -',name,day,task)));
 ylabel('Proportion Rightward Choice'); %check which one is on right
 xlabel('Coherence');
 %horizontal line
