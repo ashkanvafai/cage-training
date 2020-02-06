@@ -282,10 +282,6 @@ scatter(uniquehighdd,meanhighddRT);
 hold off;
 %-----------------------------------------------------------------------%
 %%
-subplot(4,2,7);
-figuredescription = char(strcat(name,day,task));
-text(0.4,0.5,figuredescription); axis off
-%-----------------------------------------------------------------------%
 %save('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Shimmy motion glmstatsmatrix','glmstatsmatrix');
 
          

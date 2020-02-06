@@ -1,4 +1,4 @@
-function [] = gitmotionsecondorderAnalysis(glmstatsmatrix, dates)  
+function [] = gitmotionsecondorderAnalysis(glmstatsmatrix, dates, name, task)  
 %need to pull the glm stats from
 %a particular day
 %load('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Shimmy motion glmstatsmatrix');

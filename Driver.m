@@ -1,9 +1,8 @@
 clear variables; 
 close all;  
 
-name = 'Bo';
-dates = {'20191122','20191125','20200121'};
-task = 'color';
+% name = 'Bo'; dates = {'20191122','20191125','20200121'}; task = 'color';
+% name = 'Shimmy'; dates = {'20191125','20191205','20200121'}; task = 'motion';
 
 glmstatsmatrix = [];
 
