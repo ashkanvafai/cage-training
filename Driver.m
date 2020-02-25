@@ -4,8 +4,10 @@ close all;
 
 name = 'Bo'; 
 %name = 'Shimmy'; 
+%task = 'color';
+task = 'motion';
 
-sDir = char(strcat('/Users/ashkanvafai/Desktop/Cage Training Data/',name));
+sDir = char(strcat('/Users/ashkanvafai/Desktop/Cage Training Data/',name,'/',task));
 tempdates = {};
 fileList = dir(fullfile(sDir)); 
 for i=1:length(fileList)
@@ -20,8 +22,6 @@ for i=1:length(tempdates)
     end
 end
 
-task = 'color';
-%task = 'motion';
 
 glmstatsmatrix = [];
 
@@ -29,18 +29,19 @@ glmstatsmatrix = [];
 for i=1:length(dates)
     
     filename = char(strcat(sDir,'/',dates(i),'/',task,'/'));
-    
-    if strcmp(task,'color')
-        datamatrix = gitcolorScript(filename);
-        glmstats = gitcolordataAnalysis(datamatrix, name, dates(i), task);
+   
+    if length(dir(fullfile(filename, '*.json'))) > 100
+        if strcmp(task,'color')
+            datamatrix = gitcolorScript(filename);
+            glmstats = gitcolordataAnalysis(datamatrix, name, dates(i), task);
+        end
+
+        if strcmp(task,'motion')
+            datamatrix = gitmotionScript(filename);
+            glmstats = gitmotiondataAnalysis(datamatrix, name, dates(i), task);
+        end
+        glmstatsmatrix = horzcat(glmstatsmatrix,glmstats);
     end
-    
-    if strcmp(task,'motion')
-        datamatrix = gitmotionScript(filename);
-        glmstats = gitmotiondataAnalysis(datamatrix, name, dates(i), task);
-    end
-    
-    glmstatsmatrix = horzcat(glmstatsmatrix,glmstats);
     
 end 
 

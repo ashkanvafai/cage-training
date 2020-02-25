@@ -1,17 +1,8 @@
 function [glmstats] = gitmotiondataAnalysis(motiondatamatrix, name, day, task)
-%clear variables 
-%close all  
-
-%save data file in datafolder, load data file here
-%load('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/old dataset');
-%load('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Shimmy 20191205 motion');
-%load('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Shimmy motion glmstatsmatrix');
-
 
 C = gitcolumnCodes_2D; 
 hFig=figure('Position',[400 200 1200 600],'Name',char(strcat(name,day,task)));
-colormap (hFig,winter); %Not working
-
+set(hFig,'visible','off');
 %-----------------------------------------------------------------------%
 %% 
 %coherence vs. percent correct
@@ -164,7 +155,13 @@ edges = dotdurationList(1:100:end);
 means = zeros(length(edges),1);
 binaccuracy = [];
 lines = [];
-highcohList = [cohList(1),cohList(2),cohList(length(cohList)-1),cohList(length(cohList))];
+
+if length(cohList)>4
+    highcohList = [cohList(1),cohList(2),cohList(length(cohList)-1),cohList(length(cohList))];
+end 
+if length(cohList)<4 
+    highcohList = cohList
+end 
 
 subplot(4,2,4);
 title('Accuracy vs. Dot Duration (For High Coherences)');
@@ -282,8 +279,7 @@ scatter(uniquehighdd,meanhighddRT);
 hold off;
 %-----------------------------------------------------------------------%
 %%
-%save('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Shimmy motion glmstatsmatrix','glmstatsmatrix');
-
+saveas(hFig, char(strcat('/Users/ashkanvafai/Desktop/Cage Training Data/',name,' Figures/Single Days/',name,day,task,'.png')));
          
                
                 

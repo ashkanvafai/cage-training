@@ -1,13 +1,4 @@
 function [colordatamatrix] = gitcolorScript(filename)
-%make array newColumnCodes filled with the 23 relevant codes from
-%columnCodes_2D
-
-%location of the folder with color data
-%sDir = '/Users/ashkanvafai/Desktop/Cage Training Data/Bo/20200121/color/';
-%sDir = '/Users/ashkanvafai/Desktop/Cage Training Data/Bo/20191125/color/';
-%sDir = '/Users/ashkanvafai/Desktop/Cage Training Data/Bo/20191122/color/';
-%sDir = '/Users/ashkanvafai/Documents/Motion and Color/color/';
-%sDir = '/Users/Danique/Documents/Cage training/20190131/color/';
 
 sDir = filename;
 fileList = dir(fullfile(filename, '*.json')); 

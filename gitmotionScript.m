@@ -1,16 +1,7 @@
 function [motiondatamatrix] = gitmotionScript(filename)
 %make array newColumnCodes filled with the 23 relevant codes from
-%columnCodes_2D
-
-%location of the folder with color data
-%sDir = '/Users/ashkanvafai/Desktop/Motion and Color/motion/';
 
 sDir = filename;
-%sDir = '/Users/ashkanvafai/Desktop/Cage Training Data/Bo/20191125/color/';
-%sDir = '/Users/ashkanvafai/Desktop/Cage Training Data/Bo/20191122/color/';
-%sDir = '/Users/ashkanvafai/Documents/Motion and Color/color/';
-%sDir = '/Users/Danique/Documents/Cage training/20190131/color/';
-
 fileList = dir(fullfile(sDir, '*.json')); 
 
 %create matrix to store 23 data points each for n .json files. 
@@ -48,9 +39,3 @@ for i = 1:length(fileList)
 
 end
         
-
-
-
-%save this matrix to its own .mat file 
-%save('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Shimmy 20200121 motion','motiondatamatrix');
-%load the matrix .mat file to a new script and perform calculations there.
