@@ -14,6 +14,8 @@ for i = 1:length(fileList)
     temptempData = jsondecode(fileread(filename));
     tempData = temptempData(1,:); %grabs the first row in case we had a messed up file
     
+    if tempData.goRT < 1500
+    
         if strcmp(tempData.response,'down')
             colordatamatrix(i,C.target_choice) = 0;
         elseif strcmp(tempData.response, 'up')
@@ -21,9 +23,7 @@ for i = 1:length(fileList)
         end
                 
         colordatamatrix(i,C.isCorrect) = tempData.accuracy;
-        
-        colordatamatrix(i,C.react_time) = tempData.goRT;
-        
+                
         colordatamatrix(i,C.dot_duration) = tempData.dr_DotDuration;
         
         colordatamatrix(i,C.react_time) = tempData.goRT;
@@ -35,7 +35,8 @@ for i = 1:length(fileList)
         end
         
         colordatamatrix(i,C.time_target1_on) = tempData.unixTime;
-
+    end 
+    
 end
         
 

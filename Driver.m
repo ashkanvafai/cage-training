@@ -30,7 +30,7 @@ for i=1:length(dates)
     
     filename = char(strcat(sDir,'/',dates(i),'/',task,'/'));
    
-    if length(dir(fullfile(filename, '*.json'))) > 100
+    if length(dir(fullfile(filename, '*.json'))) > 100 
         if strcmp(task,'color')
             datamatrix = gitcolorScript(filename);
             glmstats = gitcolordataAnalysis(datamatrix, name, dates(i), task);

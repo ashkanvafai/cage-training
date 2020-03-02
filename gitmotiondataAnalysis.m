@@ -1,26 +1,45 @@
 function [glmstats] = gitmotiondataAnalysis(motiondatamatrix, name, day, task)
-
 C = gitcolumnCodes_2D; 
 hFig=figure('Position',[400 200 1200 600],'Name',char(strcat(name,day,task)));
 set(hFig,'visible','off');
+%-----------------------------------------------------------------------%
+% %% how often are they rewarded after correct responses
+% tFig=figure('Position',[400 200 1200
+% 600],'Name',char(strcat(name,day,task))); set(0,'CurrentFigure',tFig)
+% juiceTime = motiondatamatrix(:,C.reward_size); accVector =
+% motiondatamatrix(:,C.isCorrect); cohVector =
+% motiondatamatrix(:,C.motionCoherence);
+% 
+% count = []; juiceforcorrect = []; for i=1:length(cohVector)
+%     if (accVector(i)==1)
+%         juiceforcorrect = horzcat(juiceforcorrect,juiceTime(i)); count =
+%         horzcat(count,i);
+%     end
+% end x = count; y = length(juiceforcorrect); subplot(1,1,1);
+% scatter(count,juiceforcorrect);
 %-----------------------------------------------------------------------%
 %% 
 %coherence vs. percent correct
 cohVector = motiondatamatrix(:,C.motionCoherence);
 accVector = motiondatamatrix(:,C.isCorrect);
-
 cohList = unique(cohVector);
+meanaccvector = [];
+
 
 for i=1:length(cohList)
-    meanvector1(i) = mean(accVector(cohVector==cohList(i)));
-end
+    for j=1:length(cohVector)
+        meanaccvector(i) = mean(accVector(cohVector==cohList(i)));
+    end
+end 
 
-
-subplot(4,2,7);
-plot(cohList,meanvector1, 'Color','r');
+hold on;
+set(0,'CurrentFigure',hFig);
+subplot(3,2,2);
+plot(cohList,meanaccvector, 'Color','r');
 title('Accuracy vs. Motion Coherence');
 ylabel('Accuracy');
 xlabel('Coherence');
+hold off;
 %-----------------------------------------------------------------------%
 %%
 dotdurationVector = motiondatamatrix(:,C.dot_duration);
@@ -58,34 +77,49 @@ end
 
 lowddmeanVectors = lowddmeanVector';
 lowddglmstats = glmfit(cohList,lowddmeanVectors,'binomial');
-%glmstatsmatrix = glmstats;%just run this line to initialize 
-%glmstatsmatrix = horzcat(glmstatsmatrix,glmstats);%just run this line for
-%subsequent additions to the matrix
 
 %using all dd values
 meanVector = [];
 for i=1:length(cohList)
-    meanVector(i) = mean(choiceVector(cohVector==cohList(i)))
+    meanVector(i) = mean(choiceVector(cohVector==cohList(i)));
 end
 
 meanVectors = meanVector';
 glmstats = glmfit(cohList,meanVectors,'binomial');
 
 
-
+allddyfit(:,1) = glmval(glmstats(:,1),cohList(:,1), 'logit');
 highddyfit(:,1) = glmval(highddglmstats(:,1),cohList(:,1), 'logit');
 lowddyfit(:,1) = glmval(lowddglmstats(:,1),cohList(:,1), 'logit');
-subplot(4,2,1);
-hold on 
+
+
+hold on;
+set(0,'CurrentFigure',hFig);
+subplot(3,2,1);
+title(char(strcat('Psychometric Function for -',name,day,task)));
+ylabel('Proportion Rightward Choice'); 
+xlabel('Coherence');
+hold off;
+
+hold on;
+scatter(cohList,meanVector);
+plot(cohList, allddyfit, 'Color','black');
+    text(max(cohList),max(allddyfit),'all dot durations','Color','black');
+hold off;
+
+hold on;
 scatter(cohList,highddmeanVector);
-scatter(cohList,lowddmeanVector);
-plot(cohList, highddyfit, 'Color','b');
+plot(cohList, highddyfit, 'Color','b','LineStyle','--');
     text(max(cohList),max(highddyfit),'high dot durations','Color','b');
+hold off;
+
+hold on;
+scatter(cohList,lowddmeanVector);
 plot(cohList, lowddyfit, 'Color','r','LineStyle','--');
     text(max(cohList),max(lowddyfit),'low dot durations','Color','r');
-title(char(strcat('Psychometric Function for -',name,day,task)));
-ylabel('Proportion Rightward Choice'); %check which one is on right
-xlabel('Coherence');
+hold off;
+
+hold on;
 %horizontal line
 x = [-1,1];
 y = [.5,.5];
@@ -95,11 +129,9 @@ q = [1,0];
 line(x,y, 'Color','Black','LineStyle','-');
 line(z,q, 'Color','Black','LineStyle','-');
 hold off;
-
 %-----------------------------------------------------------------------%
 %% 
-%Plot color accuracy as a function of time over the course of the year?
-%Already made motiondatamatrix and accVector
+%Plot accuracy over the course of the day
 
 %Make unixtime vector
 timeVector = motiondatamatrix(:,C.time_target1_on);
@@ -138,12 +170,14 @@ finalbins = datetime(bins/1000,'ConvertFrom','posixTime','TimeZone','America/New
 finalbinsrow = finalbins.';
 finalbinsrow = finalbinsrow(1:end-1);
 
+hold on;
 set(0,'CurrentFigure',hFig);
-subplot(4,2,3);
+subplot(3,2,3);
 plot(finalbinsrow,averageacc,'Color', 'bl');
 title('Performance Over the Course of the Day');
 ylabel('Accuracy (10 Minute Increments)');
 xlabel('Time');
+hold off;
 %-----------------------------------------------------------------------%
 %% 
 %Plot accuracy as a function of dot duration
@@ -154,16 +188,18 @@ dotdurationList = unique(dotdurationVector);
 edges = dotdurationList(1:100:end);
 means = zeros(length(edges),1);
 binaccuracy = [];
-lines = [];
+highcohList = [];
 
-if length(cohList)>4
+if length(cohList)>6
     highcohList = [cohList(1),cohList(2),cohList(length(cohList)-1),cohList(length(cohList))];
 end 
-if length(cohList)<4 
-    highcohList = cohList
+if length(cohList)<6
+    highcohList = cohList;
 end 
 
-subplot(4,2,4);
+hold on;
+set(0,'CurrentFigure',hFig);
+subplot(3,2,4);
 title('Accuracy vs. Dot Duration (For High Coherences)');
 ylabel('Accuracy');
 xlabel('Dot Duration (ms)');
@@ -191,9 +227,6 @@ hold off;
 
 durationDistVector  = [];
 
-set(0,'CurrentFigure',hFig);
-subplot(4,2,6);
-
 for i=1:length(dotdurationList)-1
     counter = 0;
     for j=1:length(dotdurationVector)
@@ -204,18 +237,20 @@ for i=1:length(dotdurationList)-1
     durationDistVector(i) = counter;
 end 
 
-%histogram('BinEdges',dotdurationList,'BinCounts',durationDistVector)
-%histogram(durationDistVector,dotdurationList);
+dotdurationListT = dotdurationList';
+
+
 hold on;
-histogram(durationDistVector,'Orientation', 'vertical');
+set(0,'CurrentFigure',hFig);
+subplot(3,2,6);
+histogram('BinEdges',dotdurationListT,'BinCounts',durationDistVector)
 title('Dot Duration Distribution');
-xlabel('Representative Range of Dot Duration');
-ylabel('Frequency of Occurence');
+ylabel('Frequency');
+xlabel('Dot Duration');
 hold off;
 %-----------------------------------------------------------------------%
 %%
 goRTVector = motiondatamatrix(:,C.react_time);
-responseVector = motiondatamatrix(:,C.target_choice);
 
 % parse out the correct choices from accuracy vector 
 correctChoicesGoRT = [];
@@ -232,54 +267,28 @@ for i=1:length(cohList)
     correctChoicesGoRT = [];
 end 
 
+hold on;
 set(0,'CurrentFigure',hFig);
-subplot(4,2,2);
-
+subplot(3,2,5);
 title('goRT vs. Coherence');
 xlabel('Coherence');
 ylabel('goRT');
-hold on;
+hold off;
 mid = round(((length(cohList))/2));
 last = length(cohList);
+
+hold on;
 scatter (cohList(1:mid),meangoRTs(1:mid),'blue','filled');%handle this
+hold off;
+
+hold on;
 scatter (cohList((mid+1):last),meangoRTs((mid+1):last),'red', 'filled');
 hold off;
 %-----------------------------------------------------------------------%
 %%
-highddRT = [];
-highdd = [];
-
-for i=1:length(dotdurationVector)
-    if (dotdurationVector(i)>900)  && (cohVector(i)>.46 || cohVector(i)<-.46)
-        highdd = [highdd,dotdurationVector(i)];
-        highddRT = [highddRT, goRTVector(i)];
-    end
-end
-
-uniquehighdd = unique(highdd);
-temphighddRT = [];
-meanhighddRT =[];
-
-for i=1:length(uniquehighdd)
-   for j=1:length(highdd)
-        if highdd(j)==uniquehighdd(i)
-            temphighddRT = [temphighddRT,highddRT(i)];
-            %meanhighddRT(i) = mean(highddRT(highdd==uniquehighdd(i)));
-        end 
-   end 
-   meanhighddRT = [meanhighddRT,mean(temphighddRT)];
-   temphighddRT = [];
-end
-
-subplot(4,2,5);
-xlabel('High dot durations');
-ylabel('goRT');
-hold on;
-scatter(uniquehighdd,meanhighddRT);
-hold off;
-%-----------------------------------------------------------------------%
-%%
 saveas(hFig, char(strcat('/Users/ashkanvafai/Desktop/Cage Training Data/',name,' Figures/Single Days/',name,day,task,'.png')));
+
+
          
                
                 

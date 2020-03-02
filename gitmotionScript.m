@@ -28,6 +28,9 @@ for i = 1:length(fileList)
         motiondatamatrix(i,C.dot_duration) = tempData.dr_DotDuration;
         
         motiondatamatrix(i,C.react_time) = tempData.goRT;
+        
+        motiondatamatrix(i,C.reward_size) = tempData.juiceTime;
+
   
         if tempData.direction == 0
             motiondatamatrix(i,C.motionCoherence) = (tempData.coherence)*(-1);

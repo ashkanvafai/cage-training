@@ -7,17 +7,17 @@ set(hFig,'visible','off');
 %coherence vs. percent correct
 cohVector = colordatamatrix(:,C.colorCoherence);
 accVector = colordatamatrix(:,C.isCorrect);
-
 cohList = unique(cohVector);
+meanaccvector = [];
 
 for i=1:length(cohList)
-    meanvector1(i) = mean(accVector(cohVector==cohList(i)));
+    meanaccvector(i) = mean(accVector(cohVector==cohList(i)));
 end
 
 hold on;
 set(0,'CurrentFigure',hFig)
 h2 = subplot(3,2,2);
-plot(cohList,meanvector1, 'Color','r');
+plot(cohList,meanaccvector, 'Color','r');
 title('Accuracy vs. Color Coherence');
 ylabel('Accuracy');
 xlabel('Coherence');
@@ -78,7 +78,7 @@ hold on;
 set(0,'CurrentFigure',hFig)
 subplot(3,2,1);
 title(char(strcat('Psychometric Function for -',name,day,task)));
-ylabel('Proportion Rightward Choice'); 
+ylabel('Proportion Blue Choice'); 
 xlabel('Coherence');
 hold off;
 
@@ -163,13 +163,13 @@ dotdurationList = unique(dotdurationVector);
 edges = dotdurationList(1:100:end);
 means = zeros(length(edges),1);
 binaccuracy = [];
-lines = [];
+highcohList = [];
 
-if length(cohList)>4
+if length(cohList)>6 || length(cohList) == 6
     highcohList = [cohList(1),cohList(2),cohList(length(cohList)-1),cohList(length(cohList))];
 end 
-if length(cohList)<4 
-    highcohList = cohList
+if length(cohList)<6  
+    highcohList = cohList;
 end 
 
 hold on;
@@ -212,15 +212,15 @@ for i=1:length(dotdurationList)-1
     durationDistVector(i) = counter;
 end 
 
-%histogram('BinEdges',dotdurationList,'BinCounts',durationDistVector)
-%histogram(durationDistVector,dotdurationList);
+dotdurationListT = dotdurationList';
+
 hold on;
 set(0,'CurrentFigure',hFig);
 subplot(3,2,6);
-histogram(durationDistVector);
+histogram('BinEdges',dotdurationListT,'BinCounts',durationDistVector);
 title('Dot Duration Distribution');
-ylabel('Dot Duration');
-xlabel('Representative Range of Dot Durations');
+ylabel('Frequency');
+xlabel('Dot Duration');
 hold off;
 %-----------------------------------------------------------------------%
 %%
@@ -253,11 +253,11 @@ mid = round(((length(cohList))/2));
 last = length(cohList);
 
 hold on;
-scatter (cohList(1:mid),meangoRTs(1:mid),'blue','filled');%handle this
+scatter (cohList(1:mid-1),meangoRTs(1:mid-1),'blue','filled');
 hold off;
 
 hold on;
-scatter (cohList((mid+1):last),meangoRTs((mid+1):last),'red', 'filled');
+scatter (cohList((mid):last),meangoRTs((mid):last),'red', 'filled');
 hold off;
 %-----------------------------------------------------------------------%
 %%
