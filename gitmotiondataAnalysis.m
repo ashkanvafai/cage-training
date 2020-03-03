@@ -3,20 +3,27 @@ C = gitcolumnCodes_2D;
 hFig=figure('Position',[400 200 1200 600],'Name',char(strcat(name,day,task)));
 set(hFig,'visible','off');
 %-----------------------------------------------------------------------%
-% %% how often are they rewarded after correct responses
-% tFig=figure('Position',[400 200 1200
-% 600],'Name',char(strcat(name,day,task))); set(0,'CurrentFigure',tFig)
-% juiceTime = motiondatamatrix(:,C.reward_size); accVector =
-% motiondatamatrix(:,C.isCorrect); cohVector =
-% motiondatamatrix(:,C.motionCoherence);
-% 
-% count = []; juiceforcorrect = []; for i=1:length(cohVector)
-%     if (accVector(i)==1)
-%         juiceforcorrect = horzcat(juiceforcorrect,juiceTime(i)); count =
-%         horzcat(count,i);
-%     end
-% end x = count; y = length(juiceforcorrect); subplot(1,1,1);
-% scatter(count,juiceforcorrect);
+%positions of subplots
+posInfo = [.02 .8 .1 .15];
+posDotDist = [.14 .8 .1 .2];
+posCourseOfDay = [.045 .1 .2 .55];
+
+posGoRT = [.35 .1 .3 .35];
+posPsychometric = [.35 .6 .3 .35];
+posAnnotation1 = [.36 .79 .1 .15];
+posAnnotation2 = [.36 .75 .1 .15];
+
+posAccDD = [.77 .1 .15 .55];
+posAccCoh = [.77 .8 .2 .2];
+
+%-----------------------------------------------------------------------%
+%%
+%Information about Day
+hold on;
+subplot('Position',posInfo);
+set(gca,'XColor', 'none','YColor','none');
+info = annotation('textbox',posInfo,'String',{['Monkey: ',char(name)],['Date: ',char(day)],['Task: ', char(task)]},'Color','Black','EdgeColor', 'none','FontSize',12);
+hold off;
 %-----------------------------------------------------------------------%
 %% 
 %coherence vs. percent correct
@@ -34,10 +41,11 @@ end
 
 hold on;
 set(0,'CurrentFigure',hFig);
-subplot(3,2,2);
+%subplot(3,2,2);
+subplot('Position',posAccCoh);
 plot(cohList,meanaccvector, 'Color','r');
-title('Accuracy vs. Motion Coherence');
-ylabel('Accuracy');
+title('Accuracy vs. Coherence');
+ylabel('% Correct');
 xlabel('Coherence');
 hold off;
 %-----------------------------------------------------------------------%
@@ -52,11 +60,11 @@ lowddchoices = [];
 highddcohVector =[];
 lowddcohVector =[];
 for i=1:length(choiceVector)
-    if (dotdurationVector(i)>900)
+    if (dotdurationVector(i)>600)
         highddchoices =[highddchoices,choiceVector(i)];
         highddcohVector = [highddcohVector, cohVector(i)];
     end 
-    if (dotdurationVector(i)<450)
+    if (dotdurationVector(i)<600)
         lowddchoices =[lowddchoices,choiceVector(i)];
         lowddcohVector = [lowddcohVector, cohVector(i)];
     end 
@@ -87,35 +95,39 @@ end
 meanVectors = meanVector';
 glmstats = glmfit(cohList,meanVectors,'binomial');
 
+cohSpectrum = (-1:0.1:1)';
+highddyfit(:,1) = glmval(highddglmstats(:,1),cohSpectrum, 'logit');
+lowddyfit(:,1) = glmval(lowddglmstats(:,1),cohSpectrum, 'logit');
 
-allddyfit(:,1) = glmval(glmstats(:,1),cohList(:,1), 'logit');
-highddyfit(:,1) = glmval(highddglmstats(:,1),cohList(:,1), 'logit');
-lowddyfit(:,1) = glmval(lowddglmstats(:,1),cohList(:,1), 'logit');
+hold on;
+str1 = ['b0: ', num2str(highddglmstats(1,1))];
+str2 = ['b1: ', num2str(highddglmstats(2,1))];
+str3 = ['b0: ', num2str(lowddglmstats(1,1))];
+str4 = ['b1: ', num2str(lowddglmstats(2,1))];
+
+Annotation1 = annotation('textbox',posAnnotation1 ,'String',{'Dot Duration > 652 ms',str1,str2},'Color','b','EdgeColor', 'none','FontSize',8);
+Annotation2 = annotation('textbox',posAnnotation2 ,'String',{'Dot Duration < 652 ms',str3,str4},'Color','r','EdgeColor', 'none','FontSize',8);
+hold off;
 
 
 hold on;
 set(0,'CurrentFigure',hFig);
-subplot(3,2,1);
-title(char(strcat('Psychometric Function for -',name,day,task)));
+%subplot(3,2,1);
+subplot('Position',posPsychometric);
+title(char(strcat('Choices - Split by Dot Duration')));
 ylabel('Proportion Rightward Choice'); 
 xlabel('Coherence');
 hold off;
 
 hold on;
-scatter(cohList,meanVector);
-plot(cohList, allddyfit, 'Color','black');
-    text(max(cohList),max(allddyfit),'all dot durations','Color','black');
-hold off;
-
-hold on;
 scatter(cohList,highddmeanVector);
-plot(cohList, highddyfit, 'Color','b','LineStyle','--');
+plot(cohSpectrum, highddyfit, 'Color','b','LineStyle','--');
     text(max(cohList),max(highddyfit),'high dot durations','Color','b');
 hold off;
 
 hold on;
 scatter(cohList,lowddmeanVector);
-plot(cohList, lowddyfit, 'Color','r','LineStyle','--');
+plot(cohSpectrum, lowddyfit, 'Color','r','LineStyle','--');
     text(max(cohList),max(lowddyfit),'low dot durations','Color','r');
 hold off;
 
@@ -126,8 +138,9 @@ y = [.5,.5];
 %vertical line
 z = [0,0];
 q = [1,0];
-line(x,y, 'Color','Black','LineStyle','-');
+
 line(z,q, 'Color','Black','LineStyle','-');
+line(x,y, 'Color','Black','LineStyle','-');
 hold off;
 %-----------------------------------------------------------------------%
 %% 
@@ -167,16 +180,20 @@ while endtime < timeVector(length(timeVector))
 end 
 
 finalbins = datetime(bins/1000,'ConvertFrom','posixTime','TimeZone','America/New_York','Format','dd-MMM-yyyy HH:mm:ss.SSS');
-finalbinsrow = finalbins.';
+finalbinsrow = finalbins';
 finalbinsrow = finalbinsrow(1:end-1);
+finalbinsrownum = datenum(finalbinsrow);
 
 hold on;
 set(0,'CurrentFigure',hFig);
-subplot(3,2,3);
-plot(finalbinsrow,averageacc,'Color', 'bl');
-title('Performance Over the Course of the Day');
+%subplot(3,2,3);
+subplot('Position',posCourseOfDay);
+plot(finalbinsrownum,averageacc,'Color', 'bl');
+title('% Correct Over Course of Day');
 ylabel('Accuracy (10 Minute Increments)');
 xlabel('Time');
+%xticks(finalbinsrownum(1),finalbinsrownum(length(finalbinsrownum)/2), finalbinsrownum(length(finalbinsrownum)));
+%xticklabels(datestr(finalbinsrow(1),datestr(finalbinsrow(length(finalbinsrow)/2),datestr(finalbinsrow(length(finalbinsrow))))));
 hold off;
 %-----------------------------------------------------------------------%
 %% 
@@ -199,7 +216,8 @@ end
 
 hold on;
 set(0,'CurrentFigure',hFig);
-subplot(3,2,4);
+%subplot(3,2,4);
+subplot('Position',posAccDD);
 title('Accuracy vs. Dot Duration (For High Coherences)');
 ylabel('Accuracy');
 xlabel('Dot Duration (ms)');
@@ -224,8 +242,9 @@ hold off;
 %-----------------------------------------------------------------------%
 %%    
 %plot distribution of dot durations 
-
 durationDistVector  = [];
+index=isnan(dotdurationList);
+dotdurationList(index) = [];
 
 for i=1:length(dotdurationList)-1
     counter = 0;
@@ -242,7 +261,8 @@ dotdurationListT = dotdurationList';
 
 hold on;
 set(0,'CurrentFigure',hFig);
-subplot(3,2,6);
+%subplot(3,2,6);
+subplot('Position',posDotDist);
 histogram('BinEdges',dotdurationListT,'BinCounts',durationDistVector)
 title('Dot Duration Distribution');
 ylabel('Frequency');
@@ -269,21 +289,57 @@ end
 
 hold on;
 set(0,'CurrentFigure',hFig);
-subplot(3,2,5);
+%subplot(3,2,5);
+subplot('Position',posGoRT);
 title('goRT vs. Coherence');
-xlabel('Coherence');
+xlabel('Go RT for Correct Trials');
 ylabel('goRT');
 hold off;
-mid = round(((length(cohList))/2));
-last = length(cohList);
+
+poscoh = [];
+negcoh = [];
+poscohRT = [];
+negcohRT = [];
+zerocohRT = [];
+
+for i=1:length(cohList)
+   
+    if cohList(i)<0
+        negcoh = [negcoh, cohList(i)];
+        negcohRT = [negcohRT,meangoRTs(i)];
+    end
+    
+    if cohList(i)>0
+        poscoh = [poscoh, cohList(i)];
+        poscohRT = [poscohRT,meangoRTs(i)];
+    end
+    
+    if cohList(i)==0
+        zerocohRT = meangoRTs(i);
+    end
+end 
+    
 
 hold on;
-scatter (cohList(1:mid),meangoRTs(1:mid),'blue','filled');%handle this
+z = [0,0];
+q = [0,max(meangoRTs)+100];
+line(z,q, 'Color','Black','LineStyle','-');
 hold off;
 
 hold on;
-scatter (cohList((mid+1):last),meangoRTs((mid+1):last),'red', 'filled');
+scatter (negcoh, negcohRT,'blue','filled');
 hold off;
+
+hold on;
+scatter (poscoh,poscohRT,'red', 'filled');
+hold off;
+
+hold on;
+if length(zerocohRT)==1
+    scatter (0,zerocohRT,'black', 'filled');
+end
+hold off;
+
 %-----------------------------------------------------------------------%
 %%
 saveas(hFig, char(strcat('/Users/ashkanvafai/Desktop/Cage Training Data/',name,' Figures/Single Days/',name,day,task,'.png')));
