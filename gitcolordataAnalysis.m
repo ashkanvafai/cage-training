@@ -22,7 +22,7 @@ posAccCoh = [.77 .8 .18 .15];
 hold on;
 subplot('Position',posInfo);
 set(gca,'XColor', 'none','YColor','none');
-info = annotation('textbox',posInfo,'String',{['Monkey: ',char(name)],['Date: ',char(day)],['Task: ', char(task)]},'Color','Black','EdgeColor', 'none','FontSize',12);
+info = annotation('textbox',posInfo,'String',{['Monkey: ',char(name)],['Date: ',char(day)],['Task: ', char(task)], ['Trials: ',char(num2str(size(colordatamatrix,1)))]},'Color','Black','EdgeColor', 'none','FontSize',12);
 hold off;
 %-----------------------------------------------------------------------%
 %%
@@ -58,12 +58,13 @@ highddchoices = [];
 lowddchoices = [];
 highddcohVector =[];
 lowddcohVector =[];
+
 for i=1:length(choiceVector)
-    if (dotdurationVector(i)>600)
+    if (dotdurationVector(i)>threshold)
         highddchoices =[highddchoices,choiceVector(i)];
         highddcohVector = [highddcohVector, cohVector(i)];
     end 
-    if (dotdurationVector(i)<600)
+    if (dotdurationVector(i)<threshold)
         lowddchoices =[lowddchoices,choiceVector(i)];
         lowddcohVector = [lowddcohVector, cohVector(i)];
     end 
@@ -95,7 +96,8 @@ meanVectors = meanVector';
 glmstats = glmfit(cohList,meanVectors,'binomial');
 
 
-cohSpectrum = (-1:0.1:1)';
+cohSpectrum = linspace(min(cohList),max(cohList))';                   % Evenly-Spaced Interpolation Vector
+
 highddyfit(:,1) = glmval(highddglmstats(:,1),cohSpectrum, 'logit');
 lowddyfit(:,1) = glmval(lowddglmstats(:,1),cohSpectrum, 'logit');
 
@@ -105,18 +107,19 @@ str2 = ['b1: ', num2str(highddglmstats(2,1))];
 str3 = ['b0: ', num2str(lowddglmstats(1,1))];
 str4 = ['b1: ', num2str(lowddglmstats(2,1))];
 
-h = annotation('textbox',posAnnotation1,'String',{'Dot Duration > 652 ms',str1,str2},'Color','b','EdgeColor', 'none','FontSize',6);
-l = annotation('textbox',posAnnotation2,'String',{'Dot Duration < 652 ms',str3,str4},'Color','r','EdgeColor', 'none','FontSize',6);
+threshold = num2str(median(dotdurationVector));
+h = annotation('textbox',posAnnotation1,'String',{['Dot Duration > ',threshold],str1,str2},'Color','r','EdgeColor', 'none','FontSize',6);
+l = annotation('textbox',posAnnotation2,'String',{['Dot Duration < ',threshold],str3,str4},'Color','b','EdgeColor', 'none','FontSize',6);
 hold off;
 
 
 hold on;
 set(0,'CurrentFigure',hFig)
 subplot('Position',posPsychometric);
-xlim([-1,1]);
+xlim([-.5,.5]);
 ylim([0,1]);
 title(char(strcat('Choices - Split by Dot Duration')));
-ylabel('Proportion Rightward Choice'); 
+ylabel('Proportion Upward Choice'); 
 xlabel('Coherence');
 hold off;
 
@@ -199,29 +202,42 @@ hold off;
 dotdurationVector = colordatamatrix(:,C.dot_duration);
 dotdurationList = unique(dotdurationVector);
 
-edges = dotdurationList(1:100:end);
+nanddList = isnan(dotdurationList);
+dotdurationList(nanddList) = [];
+divs = divisors(length(dotdurationList));
+%increment = divs(1,end-2);
+increment = 70;
+edges = dotdurationList(1:increment:end);
+lastedge = max(dotdurationList);
+edges = [edges;lastedge];
+
+
 means = zeros(length(edges),1);
 binaccuracy = [];
 highcohList = [];
 
-if length(cohList)>6 || length(cohList) == 6
-    highcohList = [cohList(1),cohList(2),cohList(length(cohList)-1),cohList(length(cohList))];
-end 
-if length(cohList)<6  
-    highcohList = cohList;
-end 
+
+nancohList=isnan(cohList);
+cohList(nancohList) = [];
+
+% if length(cohList)>6 || length(cohList) == 6
+%     highcohList = [cohList(1),cohList(2),cohList(length(cohList)-1),cohList(length(cohList))];
+% end 
+% if length(cohList)<6  
+%     highcohList = cohList;
+% end 
 
 hold on;
 set(0,'CurrentFigure',hFig);
 subplot('Position',posAccDD);
 ylim([0,1]);
-title('Accuracy vs. Dot Duration (For High Coherences)');
+title({'Accuracy vs. Dot Duration',''});
 ylabel('Accuracy');
 xlabel('Dot Duration (ms)');
-for x=1:length(highcohList)
+for x=1:length(cohList)
     for j=1:length(edges)-1
         for i=1:length(dotdurationVector)
-            if (dotdurationVector(i) > edges(j) && dotdurationVector(i) < edges(j+1) && (cohVector(i)) == highcohList(x)) %what if =
+            if ((dotdurationVector(i) > edges(j) ||dotdurationVector(i) == edges(j)) && dotdurationVector(i) < edges(j+1) && (cohVector(i)) == cohList(x)) %what if =
                 binaccuracy = [binaccuracy, accVector(i)];
             end
         end
@@ -231,8 +247,27 @@ for x=1:length(highcohList)
     means = means(1:end-1);
     edges = edges(1:end-1);
     hold on;
-    plot(edges,means);
-    text(max(edges),max(means),num2str(highcohList(x)));
+    %colors = ['r','b','k','m',];
+    
+    plot(edges,means);%'Color',colors(x)
+        %label = text(max(edges),max(means),num2str(cohList(x)));
+        legend(num2str(cohList),'Location','southeast');
+%         if mod(x,2) == 1
+%            % if ~isempty(label)
+%                 %label.Color = colors(x);
+%                 %label.HorizontalAlignment = 'left';
+%                 %label.FontWeight = 'bold';
+%            % end
+%         end 
+%         if mod(x,2) == 0
+%             if ~isempty(label)
+%                 %label.Color = colors(x);
+%                 %label.HorizontalAlignment = 'right';
+%                 %label.FontWeight = 'bold';
+%             end
+%        end 
+        
+    means = zeros(length(edges),1);
 end 
 
 hold off;
@@ -243,7 +278,7 @@ index=isnan(dotdurationList);
 dotdurationList(index) = [];
 durationDistVector  = [];
 
-for i=1:length(dotdurationList)-1
+for i=1:length(dotdurationList)
     counter = 0;
     for j=1:length(dotdurationVector)
         if (dotdurationVector(j) == dotdurationList(i))
@@ -253,14 +288,27 @@ for i=1:length(dotdurationList)-1
     durationDistVector(i) = counter;
 end 
 
-dotdurationListT = dotdurationList';
+%create bins 
+
+
+
+edges = dotdurationList(1:10:end);
+columnlength = round(length(durationDistVector)/10);
+m = vec2mat(durationDistVector,columnlength);
+bincounts = mean(m);    
+
+if length(edges) == length(bincounts)
+    lastedge = max(edges)+1;
+    edges = [edges;lastedge];
+end
+edgesT = edges';
 
 
 hold on;
 set(0,'CurrentFigure',hFig);
 %subplot(3,2,6);
 subplot('Position',posDotDist);
-histogram('BinEdges',dotdurationListT,'BinCounts',durationDistVector)
+histogram('BinEdges',edgesT,'BinCounts',bincounts)
 title('Dot Duration Distribution');
 ylabel('Frequency');
 xlabel('Dot Duration');
@@ -289,7 +337,7 @@ end
 hold on;
 set(0,'CurrentFigure',hFig);
 subplot('Position',posGoRT);
-xlim([-1,1]);
+xlim([-.5,.5]);
 title('Go RT for Correct Trials');
 xlabel('Coherence');
 ylabel('goRT');
@@ -326,11 +374,11 @@ line(z,q, 'Color','Black','LineStyle','-');
 hold off;
 
 hold on;
-scatter (negcoh, negcohRT,'blue','filled');
+scatter (negcoh, negcohRT,'black','filled');
 hold off;
 
 hold on;
-scatter (poscoh,poscohRT,'red', 'filled');
+scatter (poscoh,poscohRT,'black', 'filled');
 hold off;
 
 hold on;

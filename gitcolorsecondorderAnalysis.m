@@ -15,7 +15,7 @@ subplot(2,1,1);
 plot(bias, 'Color','b');
 set(gca,'xtick',1:10:length(dates),'xticklabel',dates)
 title('Bias Across Days');
-ylabel('Bias');
+ylabel('b0');
 xlabel('Day');
 hold off;
 
@@ -25,7 +25,7 @@ subplot(2,1,2);
 plot(sensitivity, 'Color','g');
 set(gca,'xtick',1:10:length(dates),'xticklabel',dates)
 title('Sensitivity Across Days');
-ylabel('Sensitivity');
+ylabel('b1');
 xlabel('Day');
 hold off;
 

@@ -22,7 +22,7 @@ posAccCoh = [.77 .8 .2 .2];
 hold on;
 subplot('Position',posInfo);
 set(gca,'XColor', 'none','YColor','none');
-info = annotation('textbox',posInfo,'String',{['Monkey: ',char(name)],['Date: ',char(day)],['Task: ', char(task)]},'Color','Black','EdgeColor', 'none','FontSize',12);
+info = annotation('textbox',posInfo,'String',{['Monkey: ',char(name)],['Date: ',char(day)],['Task: ', char(task)],['Trials: ',char(num2str(size(colordatamatrix,1)))]},'Color','Black','EdgeColor', 'none','FontSize',12);
 hold off;
 %-----------------------------------------------------------------------%
 %% 
@@ -122,13 +122,13 @@ hold off;
 hold on;
 scatter(cohList,highddmeanVector);
 plot(cohSpectrum, highddyfit, 'Color','b','LineStyle','--');
-    text(max(cohList),max(highddyfit),'high dot durations','Color','b');
+    %text(max(cohList),max(highddyfit),'high dot durations','Color','b');
 hold off;
 
 hold on;
 scatter(cohList,lowddmeanVector);
 plot(cohSpectrum, lowddyfit, 'Color','r','LineStyle','--');
-    text(max(cohList),max(lowddyfit),'low dot durations','Color','r');
+    %text(max(cohList),max(lowddyfit),'low dot durations','Color','r');
 hold off;
 
 hold on;
@@ -234,8 +234,46 @@ for x=1:length(highcohList)
     means = means(1:end-1);
     edges = edges(1:end-1);
     hold on;
-    plot(edges,means);
-    text(max(edges),max(means),num2str(highcohList(x)));
+    set(0,'CurrentFigure',hFig);
+subplot('Position',posAccDD);
+ylim([0,1]);
+title({'Accuracy vs. Dot Duration (Highest 4 Coherences)',''});
+ylabel('Accuracy');
+xlabel('Dot Duration (ms)');
+for x=1:length(highcohList)
+    for j=1:length(edges)-1
+        for i=1:length(dotdurationVector)
+            if ((dotdurationVector(i) > edges(j) ||dotdurationVector(i) == edges(j)) && dotdurationVector(i) < edges(j+1) && (cohVector(i)) == highcohList(x)) %what if =
+                binaccuracy = [binaccuracy, accVector(i)];
+            end
+        end
+        means(j) = mean(binaccuracy);
+        binaccuracy = [];
+    end
+    means = means(1:end-1);
+    edges = edges(1:end-1);
+    
+    hold on;
+    colors = ['r','b','k','m'];
+    
+    plot(edges,means,'Color',colors(x));
+        label = text(max(edges),max(means),num2str(highcohList(x)));
+        if mod(x,2) == 1
+            if ~isempty(label)
+                label.Color = colors(x);
+                label.HorizontalAlignment = 'left';
+                label.FontWeight = 'bold';
+            end
+        end 
+        if mod(x,2) == 0
+            if ~isempty(label)
+                label.Color = colors(x);
+                label.HorizontalAlignment = 'right';
+                label.FontWeight = 'bold';
+            end
+        end 
+        
+    means = zeros(length(edges),1);
 end 
 
 hold off;
