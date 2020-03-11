@@ -33,12 +33,12 @@ for i=1:length(dates)
     if length(dir(fullfile(filename, '*.json'))) > 100 
         if strcmp(task,'color')
             datamatrix = gitcolorScript(filename);
-            glmstats = gitcolordataAnalysis(datamatrix, name, dates(i), task);
+            glmstats = gitdataAnalysis(datamatrix, name, dates(i), task);
         end
 
         if strcmp(task,'motion')
             datamatrix = gitmotionScript(filename);
-            glmstats = gitmotiondataAnalysis(datamatrix, name, dates(i), task);
+            glmstats = gitdataAnalysis(datamatrix, name, dates(i), task);
         end
         glmstatsmatrix = horzcat(glmstatsmatrix,glmstats);
     end

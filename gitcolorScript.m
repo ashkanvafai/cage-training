@@ -40,9 +40,3 @@ for i = 1:length(fileList)
 end
         
 
-
-
-%save this matrix to its own .mat file 
-%save('/Users/ashkanvafai/Desktop/Cage Training Data/Data Matrices/Bo 20200121 color','colordatamatrix');
-%load the matrix .mat file to a new script and perform calculations there.
-

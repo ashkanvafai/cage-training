@@ -6,27 +6,27 @@ set(hFig,'visible','off');
 %seperate rows into vectors for bias across days and sensitivity across days
 bias = glmstatsmatrix(1,:);
 sensitivity = glmstatsmatrix(2,:);
-
+datesaxis = dates(1:10:length(dates));
 
 %produce figures that track changes in bias and sensitivity over time 
 hold on;
 set(0,'CurrentFigure',hFig)
 subplot(2,1,1);
 plot(bias, 'Color','b');
-set(gca,'xtick',1:10:length(dates),'xticklabel',dates)
+set(gca,'xtick',1:10:length(dates),'xticklabel',datesaxis)
 title('Bias Across Days');
 ylabel('b0');
-xlabel('Day');
+xlabel('Date');
 hold off;
 
 hold on;
 set(0,'CurrentFigure',hFig)
 subplot(2,1,2);
-plot(sensitivity, 'Color','g');
+plot(sensitivity, 'Color','blue');
 set(gca,'xtick',1:10:length(dates),'xticklabel',dates)
 title('Sensitivity Across Days');
 ylabel('b1');
-xlabel('Day');
+xlabel('Date');
 hold off;
 
 saveas(hFig, char(strcat('/Users/ashkanvafai/Desktop/Cage Training Data/',name,' Figures/Across Days/',name,dates(1),'-through-',dates(length(dates)),task,'.png')));
