@@ -118,8 +118,8 @@ str3 = ['b0: ', num2str(lowddglmstats(1,1))];
 str4 = ['b1: ', num2str(lowddglmstats(2,1))];
 
 threshold = num2str(threshold);
-h = annotation('textbox',posAnnotation1,'String',{['Dot Duration > ',threshold],str1,str2},'Color','r','EdgeColor', 'none','FontSize',6);
-l = annotation('textbox',posAnnotation2,'String',{['Dot Duration < ',threshold],str3,str4},'Color','b','EdgeColor', 'none','FontSize',6);
+%h = annotation('textbox',posAnnotation1,'String',{['Dot Duration > ',threshold],str1,str2},'Color','b','EdgeColor', 'none','FontSize',6);
+%l = annotation('textbox',posAnnotation2,'String',{['Dot Duration < ',threshold],str3,str4},'Color','r','EdgeColor', 'none','FontSize',6);
 hold off;
 
 
