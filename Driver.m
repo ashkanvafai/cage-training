@@ -4,8 +4,8 @@ close all;
 
 name = 'Bo'; 
 %name = 'Shimmy'; 
-task = 'color';
-%task = 'motion';
+%task = 'color';
+task = 'motion';
 
 sDir = char(strcat('/Users/ashkanvafai/Desktop/Cage Training Data/',name,'/',task));
 tempdates = {};
