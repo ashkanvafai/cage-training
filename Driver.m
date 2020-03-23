@@ -1,7 +1,6 @@
 clear variables; 
 close all;  
 
-% comment 
 
 %name = 'Bo'; 
 name = 'Shimmy'; 
