@@ -2,6 +2,7 @@ function [glmstats] = gitdataAnalysis(datamatrix, name, day, task)
 C = gitcolumnCodes_2D; 
 hFig=figure('Position',[400 200 1200 600],'Name',char(strcat(name,day,task)));
 set(hFig,'visible','off');
+
 %-----------------------------------------------------------------------%
 %%
 %positions of subplots
@@ -103,6 +104,7 @@ end
 meanVectors = meanVector';
 glmstats = glmfit(cohList,meanVectors,'binomial');
 
+
 cohSpectrum = linspace(min(cohList),max(cohList))';                   % Evenly-Spaced Interpolation Vector
 
 allddyfit(:,1) = glmval(glmstats(:,1),cohSpectrum, 'logit');
@@ -116,8 +118,8 @@ str3 = ['b0: ', num2str(lowddglmstats(1,1))];
 str4 = ['b1: ', num2str(lowddglmstats(2,1))];
 
 threshold = num2str(threshold);
-%h = annotation('textbox',posAnnotation1,'String',{['Dot Duration > ',threshold],str1,str2},'Color','b','EdgeColor', 'none','FontSize',6);
-%l = annotation('textbox',posAnnotation2,'String',{['Dot Duration < ',threshold],str3,str4},'Color','r','EdgeColor', 'none','FontSize',6);
+%h = annotation('textbox',posAnnotation1,'String',{['Dot Duration > ',threshold],str1,str2},'Color','r','EdgeColor', 'none','FontSize',6);
+l = annotation('textbox',posAnnotation2,'String',{['Dot Duration < ',threshold],str3,str4},'Color','b','EdgeColor', 'none','FontSize',6);
 hold off;
 
 
@@ -328,6 +330,7 @@ title('Dot Duration Distribution');
 ylabel('Frequency');
 xlabel('Dot Duration');
 hold off;
+
 %-----------------------------------------------------------------------%
 %%
 goRTVector = datamatrix(:,C.react_time);
@@ -404,6 +407,8 @@ hold off;
 %%
 saveas(hFig, char(strcat('/Users/ashkanvafai/Desktop/Cage Training Data/',name,' Figures/Single Days/',name,day,task,'.png')));
 
+
+         
                
                 
             

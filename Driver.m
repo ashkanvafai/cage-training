@@ -1,9 +1,8 @@
 clear variables; 
 close all;  
 
-
-name = 'Bo'; 
-%name = 'Shimmy'; 
+%name = 'Bo'; 
+name = 'Shimmy'; 
 %task = 'color';
 task = 'motion';
 
