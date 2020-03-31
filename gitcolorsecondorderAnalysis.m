@@ -8,6 +8,16 @@ bias = glmstatsmatrix(1,:);
 sensitivity = glmstatsmatrix(2,:);
 datesaxis = dates(1:10:length(dates));
 
+for i=1:length(sensitivity)
+    if sensitivity(i) > 20
+        sensitivity(i) = [];
+    end 
+     if bias(i) > 50
+        bias(i) = 50;
+    end 
+end 
+
+
 %produce figures that track changes in bias and sensitivity over time 
 hold on;
 set(0,'CurrentFigure',hFig)
